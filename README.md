@@ -1,2 +1,2 @@
 # Docker
-docker files
+This repository stores docker files
