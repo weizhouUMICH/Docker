@@ -4,48 +4,60 @@ LABEL maintainer="wzhou@broadinstitute.org"
 
 ENV LC_ALL C.UTF-8
 ENV LANG C.UTF-8
+ENV R_VERSION 3.5.1
 
-RUN apt-get update && \
-    apt-get install curl make gcc g++ cmake gfortran libreadline-dev \
-    libz-dev libbz2-dev liblzma-dev libpcre3-dev libssl-dev libcurl4-openssl-dev \
-    libopenblas-dev default-jre unzip libboost-all-dev \
-    libpng-dev libcairo2-dev tabix --yes && \
-    apt-get clean && \
-    curl -O https://cloud.r-project.org/src/base/R-3/R-3.5.1.tar.gz && \
-    tar xvzf R-3.5.1.tar.gz && \
-    cd R-3.5.1 && \
-    ./configure --with-x=no --with-blas="-lopenblas" && \
-    make && \
-    mkdir -p /usr/local/lib/R/lib && \
-    make install && \
-    cd .. && \
-    rm -rf R-3.5.1*
+# Install dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    cmake \
+    curl \
+    libboost-all-dev \
+    libbz2-dev \
+    libcairo2-dev \
+    libcurl4-openssl-dev \
+    liblzma-dev \
+    libopenblas-dev \
+    libpcre3-dev \
+    libpng-dev \
+    libreadline-dev \
+    libssl-dev \
+    libz-dev \
+    python3-pip \
+    python3-setuptools \
+    unzip \
+&& pip3 install cget \
+&& rm -rf /var/lib/apt/lists/*
 
-RUN apt-get install python3-pip --yes && \
-    pip3 install cget
+WORKDIR /tmp
 
-RUN apt install wget
-#RUN src_branch=master  && \
-#	repo_src_url=https://github.com/weizhouUMICH/SAIGE && \
-#	git clone --depth 0 -b $src_branch $repo_src_url
+# Install R from source
+RUN curl -O https://cloud.r-project.org/src/base/R-3/R-${R_VERSION}.tar.gz \
+    && tar xvzf R-${R_VERSION}.tar.gz
 
+WORKDIR /tmp/R-${R_VERSION}
 
-RUN wget https://github.com/weizhouUMICH/SAIGE/archive/master.zip && \
-        unzip master.zip && \
-        mv SAIGE-master SAIGE 
+RUN ./configure --with-x=no --with-blas="-lopenblas" \
+    && make \
+    && mkdir -p /usr/local/lib/R/lib \
+    && make install
 
-RUN Rscript SAIGE/extdata/install_packages.R
+WORKDIR /tmp
 
-RUN R CMD INSTALL SAIGE
+# Cleanup R source code
+RUN rm -rf /tmp/R-${R_VERSION}*
 
-RUN Rscript SAIGE/extdata/step1_fitNULLGLMM.R --help
+# Download latest commit of SAIGE from GitHub
+RUN curl -OL https://github.com/weizhouUMICH/SAIGE/archive/master.zip \
+    && unzip master.zip \
+    && mv SAIGE* SAIGE
 
-RUN echo "hello world" 
+# Install R packages and SAIGE
+RUN Rscript SAIGE/extdata/install_packages.R \
+    && R CMD INSTALL SAIGE
 
-RUN rm -r SAIGE && \
-	rm master.zip
+# Make R scripts to /usr/local/bin to make executable and cleanup SAIGE source code
+RUN mv SAIGE/extdata/step1_fitNULLGLMM.R SAIGE/extdata/step2_SPAtests.R SAIGE/extdata/createSparseGRM.R /usr/local/bin/ \
+    && rm -rf SAIGE \
+    && rm master.zip
 
-ENV PATH "/usr/local/bin/:$PATH"
-
-ADD step1_fitNULLGLMM.R step2_SPAtests.R createSparseGRM.R /usr/local/bin/
-
+WORKDIR /
