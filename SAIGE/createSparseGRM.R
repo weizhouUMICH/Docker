@@ -20,11 +20,13 @@ option_list <- list(
   make_option("--outputPrefix", type="character", default="~/",
     help="path and prefix to the output files [default='~/']"),
   make_option("--numRandomMarkerforSparseKin", type="integer", default=2000,
-    help="number of randomly selected markers (MAF >= 1%) to be used to identify related samples for sparse GRM [default=2000]"),
+    help="number of randomly selected markers to be used to identify related samples for sparse GRM [default=2000]"),
   make_option("--relatednessCutoff", type="numeric", default=0.125,
     help="The threshold to treat two samples as unrelated if IsSparseKin is TRUE [default=0.125]"),
   make_option("--isDiagofKinSetAsOne", type="logical", default=FALSE,
-    help="Whether to set the diagnal elements in GRM to be 1 [default='FALSE'].")
+    help="Whether to set the diagnal elements in GRM to be 1 [default='FALSE']."),
+  make_option("--minMAFforGRM", type="numeric", default=0.01,
+    help="minimum MAF of markers used for GRM")
 )
 
 
@@ -43,4 +45,5 @@ createSparseGRM(plinkFile = opt$plinkFile,
                 relatednessCutoff = opt$relatednessCutoff,
                 memoryChunk = opt$memoryChunk,
                 isDiagofKinSetAsOne = opt$isDiagofKinSetAsOne,
-                nThreads = opt$nThreads)
+                nThreads = opt$nThreads,
+		minMAFforGRM = opt$minMAFforGRM)

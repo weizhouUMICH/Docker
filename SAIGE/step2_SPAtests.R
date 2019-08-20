@@ -30,9 +30,9 @@ option_list <- list(
   make_option("--savFileIndex", type="character",default="",
     help="Path to the .s1r file (index of the sav file)."),
   make_option("--idstoExcludeFile", type="character",default="",
-    help="Path to the file containing variant ids to be excluded from the bgen or vcf file. The file does not have a header and each line is for a marker ID."),
+    help="Path to the file containing variant ids to be excluded from the bgen file. The file does not have a header and each line is for a marker ID."),
   make_option("--idstoIncludeFile", type="character",default="",
-    help="Path to the file containing variant ids to be included from the bgen or vcf file. The file does not have a header and each line is for a marker ID."),
+    help="Path to the file containing variant ids to be included from the bgen file. The file does not have a header and each line is for a marker ID."),
   make_option("--rangestoExcludeFile", type="character",default="",
     help="Path to the file containing genome regions to be excluded from the bgen file. The file contains three columns for chromosome, start, and end respectively with no header."),
   make_option("--rangestoIncludeFile", type="character",default="",
@@ -67,10 +67,12 @@ option_list <- list(
     help="Whether to exploit the sparsity of the genotype vector for less frequent variants to speed up the SPA tests or not for binary traits [default=TRUE]."), 
   make_option("--IsOutputAFinCaseCtrl", type="logical",default=FALSE,
     help="whether to output allele frequency in cases and controls for dichotomous traits [default=FALSE]"),
+     make_option("--IsOutputNinCaseCtrl", type="logical",default=FALSE,
+    help="whether to output sample sizes in cases and controls for dichotomous traits [default=FALSE]"),
   make_option("--LOCO", type="logical", default=FALSE,
     help="Whether to apply the leave-one-chromosome-out option. This option has not been extensively tested."),
   make_option("--condition", type="character",default="",
-    help="For conditional analysis. Genetic marker ids (chr:pos_ref/alt) seperated by comma. e.g.chr3:101651171_C/T,chr3:101651186_G/A, Note that currently conditional analysis is only for bgen,vcf,sav input."),
+    help="For conditional analysis. Genetic marker ids (chr:pos_ref/alt if sav/vcf dosage input , marker id if bgen input) seperated by comma. e.g.chr3:101651171_C/T,chr3:101651186_G/A, Note that currently conditional analysis is only for bgen,vcf,sav input."),
   make_option("--groupFile", type="character", default="",
     help="Path to the file containing the group information for gene-based tests. Each line is for one gene/set of variants. The first element is for gene/set name. The rest of the line is for variant ids included in this gene/set. For vcf/sav, the genetic marker ids are in the format chr:pos_ref/alt. For bgen, the genetic marker ids should match the ids in the bgen file. Each element in the line is seperated by tab."),
   make_option("--sparseSigmaFile", type="character", default="",
@@ -90,7 +92,9 @@ option_list <- list(
   make_option("--cateVarRatioMaxMACVecInclude",type="character", default="1.5,2.5,3.5,4.5,5.5,10.5,20.5",
     help="vector of float. Higher bound of MAC for MAC categories. The length equals to the number of MAC categories for variance ratio estimation minus 1. [default='1.5,2.5,3.5,4.5,5.5,10.5,20.5']"),
   make_option("--singleGClambda",type="numeric", default=1,
-    help="GC lambda values that can be used to adjust the gene-based tests results. This value is usually estimated based on the single-variant assoc test results. [default=1]")
+    help="GC lambda values that can be used to adjust the gene-based tests results. This value is usually estimated based on the single-variant assoc test results. [default=1]"),
+  make_option("--IsOutputPvalueNAinGroupTestforBinary", type="logical",default=FALSE,
+    help="whether to output p value if not account for case-control imbalance when performing group test (only for binary traits). [default=FALSE]")	
 )
 
 parser <- OptionParser(usage="%prog [options]", option_list=option_list)
@@ -139,6 +143,7 @@ SPAGMMATtest(dosageFile=opt$dosageFile,
              numLinesOutput = opt$numLinesOutput,
 	     IsSparse=opt$IsSparse,
 	     IsOutputAFinCaseCtrl = opt$IsOutputAFinCaseCtrl,
+		IsOutputNinCaseCtrl = opt$IsOutputNinCaseCtrl,
 	     LOCO = opt$LOCO,
 	     condition = opt$condition,
 	     sparseSigmaFile=opt$sparseSigmaFile,
@@ -150,7 +155,8 @@ SPAGMMATtest(dosageFile=opt$dosageFile,
 	     IsSingleVarinGroupTest=opt$IsSingleVarinGroupTest,
              cateVarRatioMinMACVecExclude=cateVarRatioMinMACVecExclude,
              cateVarRatioMaxMACVecInclude=cateVarRatioMaxMACVecInclude,
-	     singleGClambda=opt$singleGClambda
+	     singleGClambda=opt$singleGClambda,
+		IsOutputPvalueNAinGroupTestforBinary=opt$IsOutputPvalueNAinGroupTestforBinary
 )
 
 

@@ -30,9 +30,13 @@ RUN apt install wget
 #	git clone --depth 0 -b $src_branch $repo_src_url
 
 
-RUN wget https://github.com/weizhouUMICH/SAIGE/archive/master.zip && \
-        unzip master.zip && \
-        mv SAIGE-master SAIGE 
+#RUN wget https://github.com/weizhouUMICH/SAIGE/archive/master.zip && \
+#        unzip master.zip && \
+#        mv SAIGE-master SAIGE 
+
+RUN echo "update2" &&  wget https://github.com/weizhouUMICH/SAIGE/archive/SAIGE_GENE_casecontrol_imbalace.zip && \
+	unzip SAIGE_GENE_casecontrol_imbalace.zip && \
+	mv SAIGE-SAIGE_GENE_casecontrol_imbalace SAIGE
 
 RUN Rscript SAIGE/extdata/install_packages.R
 
@@ -40,11 +44,14 @@ RUN R CMD INSTALL SAIGE
 
 RUN Rscript SAIGE/extdata/step1_fitNULLGLMM.R --help
 
+RUN Rscript SAIGE/extdata/step2_SPAtests.R --help
+
+
 RUN echo "hello world" 
 
 RUN rm -r SAIGE && \
-	rm master.zip
-
+	#rm master.zip
+	rm SAIGE_GENE_casecontrol_imbalace.zip
 ENV PATH "/usr/local/bin/:$PATH"
 
 ADD step1_fitNULLGLMM.R step2_SPAtests.R createSparseGRM.R /usr/local/bin/

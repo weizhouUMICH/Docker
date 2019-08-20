@@ -61,7 +61,7 @@ option_list <- list(
   make_option("--sparseGRMSampleIDFile", type="character", default=NULL,
    help="Path to the sample ID file for the pre-calculated sparse GRM. No header is included. The order of sample IDs is corresponding to the order of samples in the sparse GRM [default=NULL]"),
   make_option("--numRandomMarkerforSparseKin", type="integer", default=2000,
-    help="number of randomly selected markers (MAF >= 1%) to be used to identify related samples for sparse GRM [default=2000]"),
+    help="number of randomly selected markers to be used to identify related samples for sparse GRM [default=2000]"),
   make_option("--isCateVarianceRatio", type="logical", default=FALSE,
     help="Whether to estimate variance ratio based on different MAC categories. If yes, variance ratio will be estiamted for multiple MAC categories corresponding to cateVarRatioMinMACVecExclude and cateVarRatioMaxMACVecInclude. Currently, if isCateVarianceRatio=TRUE, then LOCO=FALSE [default=FALSE]"),
   make_option("--relatednessCutoff", type="numeric", default=0.125,
@@ -77,7 +77,9 @@ option_list <- list(
   make_option("--useSparseSigmaConditionerforPCG", type="logical", default=FALSE,
     help="Whether to sparse GRM to speed up the PCG. Current this option is deactivated. [default='FALSE']."),
   make_option("--useSparseSigmaforInitTau", type="logical", default=FALSE,
-    help="Whether to use sparse Sigma to estiamte initial tau [default='FALSE'].")	
+    help="Whether to use sparse Sigma to estiamte initial tau [default='FALSE']."),
+  make_option("--minMAFforGRM", type="numeric", default=0.01,
+    help="minimum MAF of markers used for GRM")	
 )
 
 
@@ -131,4 +133,5 @@ fitNULLGLMM(plinkFile=opt$plinkFile,
             isCovariateTransform = opt$isCovariateTransform,
             isDiagofKinSetAsOne = opt$isDiagofKinSetAsOne,
 	    useSparseSigmaConditionerforPCG = opt$useSparseSigmaConditionerforPCG,
-	    useSparseSigmaforInitTau = opt$useSparseSigmaforInitTau)	
+	    useSparseSigmaforInitTau = opt$useSparseSigmaforInitTau,
+	     minMAFforGRM = opt$minMAFforGRM)	
