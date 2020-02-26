@@ -33,26 +33,41 @@ RUN apt install wget
 #RUN wget https://github.com/weizhouUMICH/SAIGE/archive/master.zip && \
 #        unzip master.zip && \
 #        mv SAIGE-master SAIGE 
+RUN apt-get update
 
-RUN echo "update2" &&  wget https://github.com/weizhouUMICH/SAIGE/archive/SAIGE_GENE_casecontrol_imbalace.zip && \
-	unzip SAIGE_GENE_casecontrol_imbalace.zip && \
-	mv SAIGE-SAIGE_GENE_casecontrol_imbalace SAIGE
+RUN apt-get install -y libxml2-dev
 
-RUN Rscript SAIGE/extdata/install_packages.R
+RUN echo "update 0.36.3.2 and update SKAT3" &&  wget https://github.com/weizhouUMICH/SAIGE/archive/master.zip && \
+	unzip master.zip && \
+	mv SAIGE-master SAIGE
+RUN echo "update3"
+
+#RUN Rscript SAIGE/extdata/install_packages.R
+ADD install_packages.R /usr/local/bin/
+
+
+RUN Rscript /usr/local/bin/install_packages.R
+
+
+RUN Rscript -e 'devtools::install_github("leeshawn/SKAT")'
 
 RUN R CMD INSTALL SAIGE
+RUN echo "hello world4" 
 
 RUN Rscript SAIGE/extdata/step1_fitNULLGLMM.R --help
 
 RUN Rscript SAIGE/extdata/step2_SPAtests.R --help
 
 
-RUN echo "hello world" 
-
-RUN rm -r SAIGE && \
-	#rm master.zip
-	rm SAIGE_GENE_casecontrol_imbalace.zip
 ENV PATH "/usr/local/bin/:$PATH"
 
 ADD step1_fitNULLGLMM.R step2_SPAtests.R createSparseGRM.R /usr/local/bin/
 
+RUN Rscript /usr/local/bin/createSparseGRM.R  --help
+
+RUN Rscript /usr/local/bin/step1_fitNULLGLMM.R --help
+
+RUN Rscript /usr/local/bin/step2_SPAtests.R --help
+
+
+#RUN rm -r SAIGE
