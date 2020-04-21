@@ -37,7 +37,7 @@ RUN apt-get update
 
 RUN apt-get install -y libxml2-dev
 
-RUN echo "update 0.36.3.2 and update SKAT3" &&  wget https://github.com/weizhouUMICH/SAIGE/archive/master.zip && \
+RUN echo "update 0.36.4 hello" &&  wget https://github.com/weizhouUMICH/SAIGE/archive/master.zip && \
 	unzip master.zip && \
 	mv SAIGE-master SAIGE
 RUN echo "update3"
@@ -51,6 +51,10 @@ RUN Rscript /usr/local/bin/install_packages.R
 
 RUN Rscript -e 'devtools::install_github("leeshawn/SKAT")'
 
+RUN echo "update 0.36.6" &&  wget https://github.com/weizhouUMICH/SAIGE/archive/master.zip && \
+        unzip master.zip && \
+        mv SAIGE-master SAIGE
+
 RUN R CMD INSTALL SAIGE
 RUN echo "hello world4" 
 
@@ -61,7 +65,7 @@ RUN Rscript SAIGE/extdata/step2_SPAtests.R --help
 
 ENV PATH "/usr/local/bin/:$PATH"
 
-ADD step1_fitNULLGLMM.R step2_SPAtests.R createSparseGRM.R /usr/local/bin/
+ADD SAIGE/extdata/step1_fitNULLGLMM.R SAIGE/extdata/step2_SPAtests.R SAIGE/extdata/createSparseGRM.R /usr/local/bin/
 
 RUN Rscript /usr/local/bin/createSparseGRM.R  --help
 
